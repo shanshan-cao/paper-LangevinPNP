@@ -1,0 +1,37 @@
+First generate kappa from Yukawa and string interactions in the kappa directory, and then convert these files into the input tables (containing kappa and its derivative with respect to energy) for the Langevin code in the kappa_fnc directory.
+
+1. About kappa directory：
+
+kappa-yukawa.dat 4 columns in the file：temperature Te, momentum p1, energy e1, kappa
+Go into directory: /kappa/Yukawa-term/collision-rate/charm/
+In terminal, run ./hqcompile.sh
+run ./a.out
+Get kappa-yukawa.dat
+
+kappa-string.dat 4 columns in the file：temperature Te, momentum p1, energy e1, kappa
+Go into directory: /kappa/string-term-NO-rsquare/collision-rate/charm
+In terminal, run ./hqcompile.sh
+run ./a.out
+Get kappa-yukawa.dat
+
+2. About kappa_fnc directory
+
+For generating kappa_tp-y.dat, kappa_tp-s.dat, and kappa_tp-sy.dat
+For example, kappa_tp-y.dat 4 columns in the file：temperature Te, momentum p1, kappa, d(kappa)/d(E)
+These files contain the tables of kappa and its derivative with respect to E
+
+Go into directory: /kappa-fnc/
+(1) read kappa-yukawa.dat in main.f (only keep contribution from Yukawa)
+In terminal, run ./driver.sh
+run ./a.out
+Get kappa_tp-y.dat
+(2) read kappa-string.dat in main.f (only keep contribution from string)
+In terminal, run ./driver.sh
+run ./a.out
+Get kappa_tp-s.dat
+(3) read kappa-yukawa.dat and kappa-string.dat in main.f (take the sum of contributions from Yukawa and string)
+In terminal, run ./driver.sh
+run ./a.out
+Get kappa_tp-sy.dat
+
+The main.f file needs to be slightly adjusted for each case
