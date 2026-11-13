@@ -1,0 +1,128 @@
+#!/bin/bash
+
+
+#
+# usage information
+#
+
+_usage () {
+  cat <<EOF
+Usage: $0 [options]
+
+Compile and package ebe-osg.
+
+Options:
+  -h              Display this help message and exit.
+
+  -t BUILD_TYPE   Set the CMake build type.  The default is the custom type
+                  'OSG' on Xsede and Engage, otherwise 'Release'.  Other
+                  possibilities include 'Debug' and 'None'.
+
+  -c              Clear the CMake build directory before starting build.
+EOF
+}
+
+
+
+
+#
+# settings
+#
+
+# hostnames of OSG machines
+XSEDE='osg-xsede.grid.iu.edu'
+ENGAGE='engage-submit3.renci.org'
+
+# CMake build type
+if [[ $HOSTNAME == $XSEDE || $HOSTNAME == $ENGAGE ]]; then
+  BUILD_TYPE='OSG'
+else
+  BUILD_TYPE='Release'
+fi
+
+CLEAR=false
+
+
+#
+# read options
+#
+
+while getopts ":t:hc" opt; do
+  case $opt in
+    t)
+      if [[ -z "$OPTARG" ]]; then
+        echo "option -t requires an argument"
+        exit 1
+      else
+        BUILD_TYPE="$OPTARG"
+      fi
+      ;;
+    h)
+      _usage
+      exit 0
+      ;;
+    c)
+      CLEAR=true
+      ;;
+    \?)
+      echo "invalid option: -$OPTARG"
+      echo
+      _usage
+      exit 1
+      ;;
+  esac
+done
+
+
+
+
+#
+# build and package
+#
+
+# try to load Intel compilers on OSG hosts
+if [[ $HOSTNAME == $XSEDE ]]; then
+  . /etc/profile.modules
+  module load intel/12.1
+elif [[ $HOSTNAME == $ENGAGE ]]; then
+  . /etc/profile.d/module.sh
+  module load intel{c,f}/11.1_072
+fi
+
+# use Intel compilers if available
+# CMake will read these environment vars.
+hash icpc 2> /dev/null && export CXX=icpc
+hash ifort 2> /dev/null && export FC=ifort
+
+# go to the location of this script
+cd "$( dirname "$0" )"
+
+# remove build directory if requested
+$CLEAR && rm -rf build
+
+# create build dir. if necessary
+[[ -d build ]] || mkdir build
+cd build
+
+# configure
+cmake .. \
+  -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+  -DCMAKE_INSTALL_PREFIX=/ \
+  || exit 1
+
+# number of jobs = number of cores + 1
+NJOB=$(( `getconf _NPROCESSORS_ONLN` + 1 ))
+
+# compile
+make -j$NJOB || exit 1
+
+# install to temporary packaging directory
+PKGDIR=`mktemp -d`
+make DESTDIR=$PKGDIR install || exit 1
+
+# package
+PKGFILE='ebe-osg.tar.gz'
+echo "-- Packaging $PKGFILE"
+tar czf ../$PKGFILE -C $PKGDIR .
+rm -rf $PKGDIR
+echo "-- Done"

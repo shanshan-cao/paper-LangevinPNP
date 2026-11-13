@@ -1,0 +1,3 @@
+export ftn10=dNg_over_dt_cD6.dat
+export ftn20=HQ.dat
+./diffusion < mc_glauber.dat

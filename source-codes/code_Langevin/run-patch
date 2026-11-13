@@ -1,0 +1,136 @@
+#!/bin/bash
+
+# output functions
+# source msg
+
+# msg 'starting event[s]...'
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# event-by-event
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+ nev=20
+
+
+ for (( i=0; i<$nev; i++ )); do
+
+  echo 'running HQ diffusion'
+  cd diffusion
+  export ftn20=../results1/HQaa.dat.$i
+  time ./diffusion < mc_glauber.dat || {
+    warning "diffusion failed for event, skipping to next event"
+    continue
+  }
+  cd ..
+
+  echo 'running HQ hadronization'
+  cd fragPLUSrecomb
+  export ftn20=../results2/HMnoHIaa.dat.$i
+  time ./fragPLUSrecomb < ../results1/HQaa.dat.$i || {
+    warning "hadronization failed for event, skipping to next event"
+    continue
+  }
+  cd ..
+
+#  cd HMdecay
+#  export ftn20=../results1/e.dat.$i
+#  time ./HMdecay < ../results1/HMnoHI.dat.$i || {
+#    warning "hadronization failed for event, skipping to next event"
+#    continue
+#  }
+#  cd ..
+
+#  cd B2D
+#  export ftn20=../results1/B2Daa.dat.$i
+#  time ./B2D < ../results1/HMnoHIaa.dat.$i || {
+#    warning "hadronization failed for event, skipping to next event"
+#    continue
+#  }
+ # cd ..
+
+ done
+
+# echo 'running analysis'
+# cd bmsap
+# export ftn10=spectra/AuAu200-c.dat
+
+# export ftn09=sample-cq.in
+# export ftn13=../results2/multi_HQ.dat
+# export ftn14=../results2/v2_HQ.dat
+# time cat ../results1/HQ.dat.* | ./bmsap || {
+#   warning "bmsap failed for event"
+# }
+
+# export ftn09=sample-D.in
+# export ftn13=../results2/multi_HM.dat
+# export ftn14=../results2/v2_HM.dat
+# time cat ../results1/HMnoHI.dat.* | ./bmsap || {
+#   warning "bmsap failed for event"
+# }
+# export ftn09=sample-D0.in
+# export ftn13=../results2/multi_D0.dat
+# export ftn14=../results2/v2_D0.dat
+# time cat ../results1/HMnoHI.dat.* | ./bmsap || {
+#   warning "bmsap failed for event"
+# }
+# export ftn09=sample-Ds.in
+# export ftn13=../results2/multi_Ds.dat
+# export ftn14=../results2/v2_Ds.dat
+# time cat ../results1/HMnoHI.dat.* | ./bmsap || {
+#   warning "bmsap failed for event"
+# }
+# export ftn09=sample-Lambdac.in
+# export ftn13=../results2/multi_Lambdac.dat
+# export ftn14=../results2/v2_Lambdac.dat
+# time cat ../results1/HMnoHI.dat.* | ./bmsap || {
+#   warning "bmsap failed for event"
+# }
+#
+# export ftn09=sample-e.in
+# export ftn13=../results2/multi_e.dat
+# export ftn14=../results2/v2_e.dat
+# time cat ../results1/e.dat.* | ./bmsap || {
+#   warning "bmsap failed for event"
+# }
+
+# export ftn09=sample-D.in
+# export ftn13=../results2/multi_B2D.dat
+# export ftn14=../results2/v2_B2D.dat
+# time cat ../results1/B2D.dat.* | ./bmsap || {
+#   warning "bmsap failed for event"
+# }
+
+# cd ../results2/
+# export ftn09=multi_HQ.dat
+# export ftn10=/home/sc195/research/mass_Langevin/tune-pi-pp_c/results2/multi_HQ.dat
+# export ftn20=RAA_HQ.dat
+# ./Raa.Linux 0.1107 0.1400  
+# #./Raa.Linux 1.597 1.318
+# export ftn09=multi_HM.dat
+# export ftn10=/home/sc195/research/mass_Langevin/tune-pi-pp_c/results2/multi_HM.dat
+# export ftn20=RAA_HM.dat
+# ./Raa.Linux 0.1107 0.1400
+# #./Raa.Linux 1.597 1.318
+# export ftn09=multi_e.dat
+# export ftn10=/home/sc195/research/mass_Langevin/tune-pi-pp_c/results2/multi_e.dat
+# export ftn20=RAA_e.dat
+# ./Raa.Linux 0.1107 0.1400  
+# #./Raa.Linux 1.597 1.318
+## export ftn09=multi_B2D.dat
+## export ftn10=/home/sc195/research/mass_Langevin/pp_b/results2/multi_B2D.dat
+## export ftn20=RAA_B2D.dat
+## #./Raa.Linux 0.1107 0.1400
+## ./Raa.Linux 1.597 1.318
+#
+# export ftn09=multi_Lambdac.dat
+# export ftn10=multi_D0.dat
+# export ftn20=ratio_LD.dat
+# ./Raa.Linux 1 1
+#
+# export ftn09=multi_Ds.dat
+# export ftn10=multi_D0.dat
+# export ftn20=ratio_s0.dat
+# ./Raa.Linux 1 1
+#
