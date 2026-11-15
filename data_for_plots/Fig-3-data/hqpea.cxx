@@ -196,7 +196,7 @@ void hqpea()
      gPad->SetLogy(1);
      h1->GetYaxis()->SetRangeUser(1.0e-6,2.5e1);
      h1->GetXaxis()->SetRangeUser(1.0,8.0);
-     h1->GetYaxis()->SetTitle("dN/pEdE");
+     h1->GetYaxis()->SetTitle("dN/pEdE (GeV^{-3})");
      h1->GetXaxis()->SetTitle("E (GeV) ");
      h1->GetXaxis()->SetLabelSize(0.05);
      h1->GetYaxis()->SetLabelSize(0.05);
